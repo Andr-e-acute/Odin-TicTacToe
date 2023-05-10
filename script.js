@@ -1,34 +1,43 @@
-// GameBoard object use module store as an array
-const gameBoard=(()=>{
-const board=["","","","","","","","",""]
+// GameBoard object  module store
+const gameBoard = (() => {
+  const board = ["", "", "", "", "", "", "", "", ""];
 
-function renderTo(){
+  // display board
+  const displayBoard = document.querySelector("#gameboard");
+  board.forEach((element, index) => {
+    const field = document.createElement("div");
+    field.className = "field";
+    field.setAttribute("data-index", index);
     
-}
-return{
-    board
-}
+    // is there a better place for this?
+    field.addEventListener("click", (event) => {
+      console.log(event.target);
+    });
+
+    displayBoard.appendChild(field);
+  });
+
+  return {
+    board,
+  };
 })();
 
 // Player objects factory
 
+// displayController
 
-// displayController 
-
-// gameFlow Object? use module
-
+// game Flow Object module
+const game = (() => {})();
 
 // render game board function maybe as a method in gameboard?
 
-
 //
 
-
 const startBTN = document.querySelector("#start");
-startBTN.addEventListener("click",(e)=>{
-    console.log(e.target)
-})
+startBTN.addEventListener("click", (e) => {
+  console.log(e.target);
+});
 const restartBTN = document.querySelector("#restart");
-restartBTN.addEventListener("click",(e)=>{
-    console.log(e.target)
-})
+restartBTN.addEventListener("click", (e) => {
+  console.log(e.target);
+});
