@@ -1,14 +1,22 @@
 // GameBoard object  module store
 const GameBoard = (() => {
-  const board = ["", "", "", "", "", "", "", "", ""];
+  let board =["", "", "", "", "", "", "", "", ""];
+  
   const htmlBoard = document.querySelector("#gameboard");
 
+  function resetBoard(){
+   for (let index = 0; index < board.length; index++) {
+    board[index]= "";
+    
+   }
+  }
   // click handler
   // ? move to  game flow logic
-  function clickHandler() {
-    const playerSymbol = "x";
-    this.innerText = playerSymbol; //
-    board[this.dataset.index] = playerSymbol;
+  function clickHandler(event) {
+
+    event.target.innerText = Game.activeMark(); //
+    board[event.target.dataset.index] = Game.activeMark();
+    Game.nextPlayer();
   }
 
   // display board
@@ -25,29 +33,52 @@ const GameBoard = (() => {
 
   return {
     render,
-    board,
+    resetBoard,
+    // todo delete
+    board
   };
 })();
 
 // Player objects factory
-const createPlayer = (name, marker) => ({name, marker})
+const createPlayer = (name, mark) => ({ name, mark });
 
 // game Flow / logic Object module
 const Game = (() => {
-  // ? decide what the user can do
-  const players = [createPlayer("Player1","X"),createPlayer("Player2","O")];
 
+  let players = [];
+  let activePlayer = 0;
+
+
+  function start() {
+    players = [
+      createPlayer(document.querySelector("#player1").value, "X"), 
+      createPlayer(document.querySelector("#player2").value, "O")]
+    
+    GameBoard.render()
+  }
+
+  const activeMark = () => players[activePlayer].mark;
+
+  const nextPlayer = () => {
+    activePlayer = activePlayer === 0 ? 1 : 0;
+  };
+
+ 
+  return {
+    activeMark,
+    nextPlayer,
+    start
+  };
 })();
 
-// render game board function maybe as a method in gameboard?
 
-//
 
 const startBTN = document.querySelector("#start");
 startBTN.addEventListener("click", (e) => {
-  console.log(e.target);
+  Game.start()
 });
 const restartBTN = document.querySelector("#restart");
 restartBTN.addEventListener("click", () => {
-  GameBoard.render();
+  Game.start();
+  GameBoard.resetBoard()
 });
