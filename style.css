@@ -1,10 +1,16 @@
 
 #gameboard{
     display: grid;
-    grid-template-columns: repeat(3,100px);
-    grid-template-rows: repeat(3,100px);
+    grid-template-columns: repeat(3,180px);
+    grid-template-rows: repeat(3,180px);
 }
-#gameboard .field{
+/* #gameboard .field{
     border: 2px solid red;
     
+} */
+svg{
+    position: absolute;
+    z-index: -1;
+
 }
+
