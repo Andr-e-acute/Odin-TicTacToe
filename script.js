@@ -23,6 +23,7 @@ const GameBoard = (() => {
     checkForWin(board);
   }
   function createMark() {
+    
     const markArr=(Game.activeMark()==="X")?Xmark:Omark;
     const randomNum=Math.floor(Math.random() * markArr.length)
     return createSvg(markArr[randomNum]);
