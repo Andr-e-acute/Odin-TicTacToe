@@ -63,7 +63,12 @@ const Game = (() => {
     Game.nextPlayer();
     checkForWin(GameBoard.board);
   }
-
+  function removeClickedField(){
+    const fields =document.querySelectorAll(".field")
+    fields.forEach((field)=>{
+      field.removeEventListener("click", Game.clickedField)
+    })
+  }
   const activeMark = () => players[activePlayer].mark;
 
  
@@ -81,6 +86,7 @@ const Game = (() => {
         document.querySelector(
           ".gameMessage"
         ).textContent = `${Game.getPlayer()} won the Game`;
+        removeClickedField()
       }
     }
 
