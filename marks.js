@@ -97,5 +97,38 @@ const Omark = [
     },
   ],
 ];
+ 
+  function createSvg(arr) {
+    const iconSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
 
-export { Omark, Xmark };
+    iconSvg.setAttribute("width", "180");
+    iconSvg.setAttribute("height", "180");
+
+    // x mark needs more then one path
+
+    arr.forEach((obj) => {
+      const iconPath = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
+      iconPath.setAttribute("stroke-linecap", "round");
+      iconPath.setAttribute("stroke-linejoin", "round");
+      iconPath.setAttribute("fill", "none");
+      // only these attribute will be different
+      iconPath.setAttribute("d", `${obj.d}`);
+      iconPath.setAttribute("stroke-width", `${obj.strokeWidth}`);
+      iconPath.setAttribute("stroke", `${obj.stroke}`);
+
+      iconSvg.appendChild(iconPath);
+    });
+    return iconSvg;
+  }
+  export default function createMark(markType) {
+    const markArr = markType === "X" ? Xmark : Omark;
+    const randomNum = Math.floor(Math.random() * markArr.length);
+    return createSvg(markArr[randomNum]);
+  }
+export {createMark };

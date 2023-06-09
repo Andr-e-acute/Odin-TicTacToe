@@ -1,82 +1,44 @@
-import { Omark, Xmark } from "./svg.js";
-// console.log(Xmark[0])
-// console.log(Omark[0])
-// GameBoard object  module store
+/* eslint-disable no-use-before-define */
+// TODO clean this file
+
+// round based logic? X starts first.
+// i think i need rounds for minmax.
+
+// eslint-disable-next-line import/extensions
+import { createMark } from "./marks.js";
+// live server don't work without .js eslint hates it
+
 const GameBoard = (() => {
   const board = ["", "", "", "", "", "", "", "", ""];
-
-  const htmlBoard = document.querySelector("#gameboard");
-
-  function resetBoard() {
+   function resetBoard() {
     for (let index = 0; index < board.length; index += 1) {
       board[index] = "";
     }
   }
-  // click handler
-  // ? move to  game flow logic
-  function clickHandler(event) {
-    // event.target.innerText = Game.activeMark(); //
-    event.target.appendChild(createMark());
+  return {
+    resetBoard,
+    board,
+  };
+})();
 
-    board[event.target.dataset.index] = Game.activeMark();
-    Game.nextPlayer();
-    checkForWin(board);
-  }
-  function createMark() {
-    
-    const markArr=(Game.activeMark()==="X")?Xmark:Omark;
-    const randomNum=Math.floor(Math.random() * markArr.length)
-    return createSvg(markArr[randomNum]);
-  }
-  function createSvg(arr) {
-    const iconSvg = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "svg"
-    );
+const DisplayController = (() => {
+  const htmlBoard = document.querySelector("#gameboard");
 
-    iconSvg.setAttribute("width", "180");
-    iconSvg.setAttribute("height", "180");
-
-    // x mark needs more then one path
-
-    arr.forEach((obj) => {
-      const iconPath = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path"
-      );
-      iconPath.setAttribute("stroke-linecap", "round");
-      iconPath.setAttribute("stroke-linejoin", "round");
-      iconPath.setAttribute("fill", "none");
-      // only these attribute will be different
-      iconPath.setAttribute("d", `${obj.d}`);
-      iconPath.setAttribute("stroke-width", `${obj.strokeWidth}`);
-      iconPath.setAttribute("stroke", `${obj.stroke}`);
-
-      iconSvg.appendChild(iconPath);
-    });
-    return iconSvg;
-  }
-
-  // display board
-  function render() {
+  function createHtmlBoard() {
     htmlBoard.innerText = "";
-    board.forEach((e, index) => {
+    GameBoard.board.forEach((_, index) => {
       const field = document.createElement("div");
       field.className = "field";
       field.setAttribute("data-index", index);
-      field.addEventListener("click", clickHandler, { once: true });
+      field.addEventListener("click", Game.clickedField, { once: true });
       htmlBoard.appendChild(field);
     });
   }
 
   return {
-    render,
-    resetBoard,
-    // todo delete
-    board,
+    createHtmlBoard,
   };
 })();
-
 // Player objects factory
 const createPlayer = (name, mark) => ({ name, mark });
 
@@ -84,6 +46,7 @@ const createPlayer = (name, mark) => ({ name, mark });
 const Game = (() => {
   let players = [];
   let activePlayer = 0;
+  // let counter=0
   // counter for turns only need to check for win after 5 and draw ==9
 
   function start() {
@@ -91,56 +54,64 @@ const Game = (() => {
       createPlayer(document.querySelector("#player1").value, "X"),
       createPlayer(document.querySelector("#player2").value, "O"),
     ];
+    DisplayController.createHtmlBoard();
+  }
 
-    GameBoard.render();
+  function clickedField(event) {
+    event.target.appendChild(createMark(Game.activeMark()));
+    GameBoard.board[event.target.dataset.index] = Game.activeMark();
+    Game.nextPlayer();
+    checkForWin(GameBoard.board);
   }
 
   const activeMark = () => players[activePlayer].mark;
 
-  // use turns?
+ 
   const nextPlayer = () => {
     activePlayer = activePlayer === 0 ? 1 : 0;
   };
   const getPlayer = () => players[activePlayer].name;
+ 
+  function checkForWin(board) {
+    function threeOfKind(first, second, third) {
+      if (first === "") {
+        return;
+      }
+      if (first === second && first === third) {
+        document.querySelector(
+          ".gameMessage"
+        ).textContent = `${Game.getPlayer()} won the Game`;
+      }
+    }
+
+    for (let i = 0; i < 3; i += 1) {
+      // check columns
+      threeOfKind(board[i], board[i + 3], board[i + 6]);
+      // check rows
+      threeOfKind(board[i * 3], board[i * 3 + 1], board[i * 3 + 2]);
+    }
+    // cross
+    threeOfKind(board[0], board[4], board[8]);
+    threeOfKind(board[2], board[4], board[6]);
+  }
+
   return {
     activeMark,
     nextPlayer,
     start,
     getPlayer,
+    clickedField,
   };
 })();
 
-//
-
-function checkForWin(board) {
-  function threeOfKind(first, second, third) {
-    if (first === "") {
-      return;
-    }
-    if (first === second && first === third) {
-      document.querySelector(
-        ".gameMessage"
-      ).textContent = `${Game.getPlayer()} won the Game`;
-    }
-  }
-
-  for (let i = 0; i < 3; i += 1) {
-    // check columns
-    threeOfKind(board[i], board[i + 3], board[i + 6]);
-    // check rows
-    threeOfKind(board[i * 3], board[i * 3 + 1], board[i * 3 + 2]);
-  }
-  // cross
-  threeOfKind(board[0], board[4], board[8]);
-  threeOfKind(board[2], board[4], board[6]);
-}
-
 const startBTN = document.querySelector("#start");
-startBTN.addEventListener("click", (e) => {
+startBTN.addEventListener("click", () => {
   Game.start();
 });
+
 const restartBTN = document.querySelector("#restart");
 restartBTN.addEventListener("click", () => {
   Game.start();
   GameBoard.resetBoard();
+  document.querySelector(".gameMessage").textContent = "";
 });
